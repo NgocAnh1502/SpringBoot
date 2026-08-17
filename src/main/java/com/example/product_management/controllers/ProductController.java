@@ -2,6 +2,7 @@ package com.example.product_management.controllers;
 
 import com.example.product_management.Repository.ProductRepository;
 import com.example.product_management.models.Product;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -30,12 +31,12 @@ public class ProductController {
     }
 
     @PostMapping
-    public Product addProduct(@RequestBody Product product) {
+    public Product addProduct(@Valid @RequestBody Product product) {
         return productRepository.save(product);
     }
 
     @PutMapping("/{id}")
-    public Product updateProduct(@PathVariable Integer id, @RequestBody Product productDetails) {
+    public Product updateProduct(@PathVariable Integer id,@Valid @RequestBody Product productDetails) {
         Product product = productRepository.findById(id).orElseThrow();
         product.setName(productDetails.getName());
         product.setPrice(productDetails.getPrice());
