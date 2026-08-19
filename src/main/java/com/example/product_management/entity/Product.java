@@ -1,4 +1,4 @@
-package com.example.product_management.models;
+package com.example.product_management.entity;
 
 import jakarta.persistence.*;
 
@@ -10,11 +10,13 @@ public class Product {
     private Integer id;
     private String name;
     private Double price;
-    private String category;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private Category category;
 
     public Product() {}
 
-    public Product(Integer id, String name, Double price, String category) {
+    public Product(Integer id, String name, Double price, Category category) {
         this.id = id;
         this.name = name;
         this.price = price;
@@ -29,11 +31,11 @@ public class Product {
         this.price = price;
     }
 
-    public String getCategory() {
+    public Category getCategory() {
         return category;
     }
 
-    public void setCategory(String category) {
+    public void setCategory(Category category) {
         this.category = category;
     }
 

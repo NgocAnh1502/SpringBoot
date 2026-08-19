@@ -1,10 +1,6 @@
 package com.example.product_management.dtos;
 
-import com.example.product_management.entity.Product;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
-@JsonPropertyOrder({"id", "name", "price", "category"})
-public class ProductResponse {
+public class ProductDTO {
     private Integer id;
     private String name;
     private Double price;
@@ -12,22 +8,31 @@ public class ProductResponse {
     private Integer categoryId;
     private String categoryName;
 
-    public ProductResponse() {}
+    public ProductDTO() {}
 
     public Integer getId() {
         return id;
     }
-    public void setId(Integer id) {this.id = id;}
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
     }
-    public void setName(String name) {this.name = name;}
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public Double getPrice() {
         return price;
     }
-    public void setPrice(Double price) {this.price = price;}
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
 
     public Integer getCategoryId() {
         return categoryId;
@@ -42,6 +47,14 @@ public class ProductResponse {
     }
 
     public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
+    public ProductDTO(Integer id, String name, Double price, Integer categoryId, String categoryName) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.categoryId = categoryId;
         this.categoryName = categoryName;
     }
 }

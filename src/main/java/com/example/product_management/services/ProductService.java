@@ -2,51 +2,61 @@ package com.example.product_management.services;
 
 import com.example.product_management.dtos.ProductRequest;
 import com.example.product_management.dtos.ProductResponse;
-import com.example.product_management.models.Product;
+import com.example.product_management.entity.Category;
+import com.example.product_management.entity.Product;
+import com.example.product_management.mapper.ProductMapper;
+import com.example.product_management.repository.CategoryRepository;
 import com.example.product_management.repository.ProductRepository;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 public class ProductService {
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
+    private final ProductMapper productMapper;
 
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository, ProductMapper productMapper) {
         this.productRepository = productRepository;
+        this.categoryRepository = categoryRepository;
+        this.productMapper = productMapper;
     }
 
-    public List<ProductResponse> getAllProducts(String name, String category){
-        List<Product> products;
+    public Page<ProductResponse> getAllProducts(String name, String categoryName,  Pageable pageable) {
+        Page<Product> productPage;
 
-        if(name != null && category != null){
-            products = productRepository.findByNameAndCategory(name,category);
+        if(name != null && categoryName != null){
+            productPage = productRepository.findByNameContainingIgnoreCaseAndCategoryNameContainingIgnoreCase(name, categoryName, pageable);
         } else if (name != null) {
-            products = productRepository.findByName(name);
-        } else if (category != null) {
-            products = productRepository.findByCategory(category);
+            productPage = productRepository.findByNameContainingIgnoreCase(name, pageable);
+        } else if (categoryName != null) {
+            productPage = productRepository.findByCategoryNameContainingIgnoreCase(categoryName, pageable);
         } else {
-            products = productRepository.findAll();
+            productPage = productRepository.findAll(pageable);
         }
-        return products.stream().map(ProductResponse::new).collect(Collectors.toList());
+        return productPage.map(productMapper::toProductResponse);
     }
 
     public ProductResponse getProductById(Integer id){
         Product product = findProduct(id);
-        return new ProductResponse(product);
+        return productMapper.toProductResponse(product);
     }
 
     public ProductResponse addProduct(ProductRequest request){
         Product product = new Product();
         product.setName(request.getName());
         product.setPrice(request.getPrice());
-        product.setCategory(request.getCategory());
+
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Khong tim thay Category"));
+        product.setCategory(category);
 
         Product savedProduct = productRepository.save(product);
-        return new ProductResponse(savedProduct);
+        return productMapper.toProductResponse(savedProduct);
     }
 
     public ProductResponse updateProduct(Integer id, ProductRequest request){
@@ -54,10 +64,13 @@ public class ProductService {
 
         product.setName(request.getName());
         product.setPrice(request.getPrice());
-        product.setCategory(request.getCategory());
+
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy Category"));
+        product.setCategory(category);
 
         Product updatedProduct = productRepository.save(product);
-        return new ProductResponse(updatedProduct);
+        return productMapper.toProductResponse(updatedProduct);
     }
 
     public void deleteProduct(Integer id){

@@ -4,6 +4,8 @@ import com.example.product_management.dtos.ProductRequest;
 import com.example.product_management.dtos.ProductResponse;
 import com.example.product_management.services.ProductService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,9 +21,10 @@ public class ProductController {
     }
 
     @GetMapping
-    public List<ProductResponse> getAllProducts(@RequestParam(required = false) String name,
-                                                @RequestParam(required = false) String category) {
-        return productService.getAllProducts(name, category);
+    public Page<ProductResponse> getAllProducts(@RequestParam(required = false) String name,
+                                                @RequestParam(required = false) String category,
+                                                Pageable pageable) {
+        return productService.getAllProducts(name, category, pageable);
     }
 
     @GetMapping("/{id}")

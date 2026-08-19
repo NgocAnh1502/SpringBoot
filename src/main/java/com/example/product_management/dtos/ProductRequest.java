@@ -12,8 +12,8 @@ public class ProductRequest {
     @Min(value = 0, message = "Gia san pham khong duoc be hon 0")
     private Double price;
 
-    @NotBlank(message = "Ten danh muc khong duoc de trong")
-    private String category;
+    @NotNull(message = "Id danh muc khong duoc de trong")
+    private Integer categoryId;
 
     public String getName() {
         return name;
@@ -31,11 +31,11 @@ public class ProductRequest {
         this.price = price;
     }
 
-    public String getCategory() {
-        return category;
+    public Integer getCategoryId() {
+        return categoryId;
     }
 
-    public void setCategory(String category) {
-        this.category = category;
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
     }
 }
