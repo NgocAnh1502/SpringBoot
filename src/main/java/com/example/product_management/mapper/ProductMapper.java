@@ -15,14 +15,14 @@ public interface ProductMapper {
     ProductResponse toProductResponse(Product product);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(source = "request.name", target = "name")
-    @Mapping(source = "request.price", target = "price")
+    @Mapping(source = "productRequest.name", target = "name")
+    @Mapping(source = "productRequest.price", target = "price")
     @Mapping(source = "category", target = "category")
     Product toEntity(ProductRequest productRequest, Category category);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(source = "request.name", target = "name")
-    @Mapping(source = "request.price", target = "price")
+    @Mapping(source = "productRequest.name", target = "name")
+    @Mapping(source = "productRequest.price", target = "price")
     @Mapping(source = "category", target = "category")
     void updateEntityFromRequest(ProductRequest productRequest, Category category, @MappingTarget Product product);
 }
