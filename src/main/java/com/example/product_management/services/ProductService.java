@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
@@ -46,33 +47,27 @@ public class ProductService {
         return productMapper.toProductResponse(product);
     }
 
+    @Transactional
     public ProductResponse addProduct(ProductRequest request){
-        Product product = new Product();
-        product.setName(request.getName());
-        product.setPrice(request.getPrice());
+        Category category = findCategory(request.getCategoryId());
 
-        Category category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Khong tim thay Category"));
-        product.setCategory(category);
-
+        Product product = productMapper.toEntity(request, category);
         Product savedProduct = productRepository.save(product);
         return productMapper.toProductResponse(savedProduct);
     }
 
+    @Transactional
     public ProductResponse updateProduct(Integer id, ProductRequest request){
+        Category category = findCategory(request.getCategoryId());
         Product product = findProduct(id);
 
-        product.setName(request.getName());
-        product.setPrice(request.getPrice());
-
-        Category category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy Category"));
-        product.setCategory(category);
+        productMapper.updateEntityFromRequest(request, category, product);
 
         Product updatedProduct = productRepository.save(product);
         return productMapper.toProductResponse(updatedProduct);
     }
 
+    @Transactional
     public void deleteProduct(Integer id){
         Product product = findProduct(id);
         productRepository.delete(product);
@@ -81,5 +76,10 @@ public class ProductService {
     private Product findProduct(Integer id){
         return productRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Khong tim thay san pham voi id: " + id));
+    }
+
+    private Category findCategory(Integer categoryId){
+        return categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Khong tim thay category"));
     }
 }
